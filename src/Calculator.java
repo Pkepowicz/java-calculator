@@ -7,7 +7,13 @@ import java.awt.event.ActionListener;
 public class Calculator {
 
     static JTextField textField;
-    static String currentScreenValue, savedNumber, lastPressed, currentOperator, previousOperator;
+
+    private static int int1, int2;
+    private static String lastSign;
+    static boolean lastInputWasEqual = false;
+    static boolean lastInputWasAction = true;
+    static boolean dividingByZero = false;
+    static boolean hasBeenSolved = true;
 
     public static void createAndShowGUI() {
 
@@ -16,23 +22,16 @@ public class Calculator {
                 String buttonPressed = e.getActionCommand();
                 switch (buttonPressed) {
                     case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
-                        addValue(buttonPressed);
-                        updateScreen();
-                        lastPressed = buttonPressed;
+                        pressNumber(buttonPressed);
                         break;
                     case "+", "-", "*", "/":
-                        operatorPressed(buttonPressed);
-                        updateScreen();
-                        lastPressed = buttonPressed;
+                        pressSign(buttonPressed);
                         break;
                     case "=":
-                        equalsPressed();
-                        updateScreen();
-                        lastPressed = buttonPressed;
+                        pressEquals();
                         break;
                     case "C":
                         clean();
-                        updateScreen();
                         break;
                     default:
                         System.out.println("Nieznany przycisk");
@@ -87,7 +86,6 @@ public class Calculator {
         textField.setBounds(5, 5, 300, 30);
         textField.setFont(new Font("Arial", Font.BOLD,16));
         textField.setHorizontalAlignment(JTextField.RIGHT);
-        textField.setText("0");
         textField.setEditable(false);
 
         // Ustawienia okna
@@ -101,74 +99,42 @@ public class Calculator {
         jf.add(jp);
         jf.setVisible(true);
     }
-
-    private static void updateScreen() {
-        textField.setText(currentScreenValue);
+    public static void pressNumber(String pressed) {
+        if (lastInputWasAction) {
+            textField.setText("");
+        }
+        textField.setText(textField.getText().concat(pressed));
+        lastInputWasAction = false;
     }
 
-    private static void addValue(String a) {
-        if(currentScreenValue == null || currentScreenValue.equals("0") || lastPressed.equals("=")) {
-            //clean();
-            currentScreenValue = a;
-            return;
-        }
-        currentScreenValue += a;
+    private static void pressSign(String pressed) {
+        lastSign = pressed;
+        int2 = Integer.parseInt(textField.getText());
+        lastInputWasAction = true;
     }
 
-    private static void operatorPressed(String pressed) {
-        if (currentOperator.isEmpty()) {
-            currentOperator = pressed;
-            return;
-        }
-        if (!previousOperator.isEmpty()) {
-            equalsPressed();
-        }
-        currentOperator = pressed;
-        savedNumber = currentScreenValue;
-        currentScreenValue = "0";
-    }
-
-    private static void equalsPressed() {
-        if (currentOperator.length() < 1 || savedNumber.length() < 1) {
-            return;
-        }
-        if (lastPressed.equals("=")) {
-            switch (currentOperator) {
-                case "+":
-                    currentScreenValue = Integer.toString(Integer.parseInt(currentScreenValue) + Integer.parseInt(savedNumber));
-                    return;
-                case "-":
-                    currentScreenValue = Integer.toString(Integer.parseInt(currentScreenValue) - Integer.parseInt(savedNumber));
-                    return;
-                case "*":
-                    currentScreenValue = Integer.toString(Integer.parseInt(currentScreenValue) * Integer.parseInt(savedNumber));
-                    return;
-                case "/":
-                    currentScreenValue = Integer.toString(Integer.parseInt(currentScreenValue) / Integer.parseInt(savedNumber));
-                    return;
-            }
-        }
-        switch (currentOperator) {
+    private static void pressEquals() {
+        int temp = 0;
+        int1 = Integer.parseInt(textField.getText());
+        switch (lastSign) {
             case "+":
-                currentScreenValue = Integer.toString(Integer.parseInt(savedNumber) + Integer.parseInt(currentScreenValue));
-                return;
+                temp = int1 + int2;
+                break;
             case "-":
-                currentScreenValue = Integer.toString(Integer.parseInt(savedNumber) - Integer.parseInt(currentScreenValue));
-                return;
+                temp = int1 - int2;
+                break;
             case "*":
-                currentScreenValue = Integer.toString(Integer.parseInt(savedNumber) * Integer.parseInt(currentScreenValue));
-                return;
+                temp = int1 * int2;
+                break;
             case "/":
-                currentScreenValue = Integer.toString(Integer.parseInt(savedNumber) / Integer.parseInt(currentScreenValue));
-                return;
+                temp = int1 / int2;
+                break;
         }
+        textField.setText(String.valueOf(temp));
     }
 
-    private static void clean() {
-        currentScreenValue = "0";
-        savedNumber = null;
-        lastPressed = null;
-        currentOperator = null;
+    public static void clean() {
+        textField.setText("");
     }
 
     public static void main(String[] args) {
