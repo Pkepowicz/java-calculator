@@ -8,11 +8,13 @@ public class Calculator {
 
     static JTextField textField;
 
-    private static int int1, int2;
+    private static int temp, int1, int2;
     private static String lastSign;
     static boolean lastInputWasEqual = false;
     static boolean lastInputWasAction = true;
+
     static boolean dividingByZero = false;
+    static boolean solved = true;
     static boolean hasBeenSolved = true;
 
     public static void createAndShowGUI() {
@@ -103,38 +105,84 @@ public class Calculator {
         if (lastInputWasAction) {
             textField.setText("");
         }
+        if (lastInputWasEqual) {
+            textField.setText("");
+            lastSign = null;
+        }
         textField.setText(textField.getText().concat(pressed));
         lastInputWasAction = false;
+        lastInputWasEqual = false;
     }
 
     private static void pressSign(String pressed) {
+        if(lastInputWasAction) {
+            lastSign = pressed;
+            return;
+        }
+        if (textField.getText().isBlank()) {
+            lastSign = pressed;
+            int2 = 0;
+            solved = false;
+            lastInputWasAction = true;
+            lastInputWasEqual = false;
+            return;
+        }
+        if (!solved) {
+            pressEquals();
+            solved = true;
+        }
         lastSign = pressed;
         int2 = Integer.parseInt(textField.getText());
+        solved = false;
         lastInputWasAction = true;
+        lastInputWasEqual = false;
     }
 
     private static void pressEquals() {
-        int temp = 0;
-        int1 = Integer.parseInt(textField.getText());
+        if (lastSign == null) {
+            solved = true;
+            lastInputWasEqual = false;
+            lastInputWasAction = true;
+            hasBeenSolved = true;
+            if (!textField.getText().isEmpty()) {
+                int2 = Integer.parseInt(textField.getText());
+            }
+            return;
+        }
+        if (lastInputWasEqual) {
+            int2 = temp;
+        } else {
+            temp = int2;
+            int1 = Integer.parseInt(textField.getText());
+        }
         switch (lastSign) {
             case "+":
-                temp = int1 + int2;
+                temp = int2 + int1;
                 break;
             case "-":
-                temp = int1 - int2;
+                temp = int2 - int1;
                 break;
             case "*":
-                temp = int1 * int2;
+                temp = int2 * int1;
                 break;
             case "/":
-                temp = int1 / int2;
+                temp = int2 / int1;
                 break;
         }
         textField.setText(String.valueOf(temp));
+        lastInputWasEqual = true;
+        lastInputWasAction = false;
+        solved = true;
     }
 
     public static void clean() {
         textField.setText("");
+        int1 = 0;
+        int2 = 0;
+        lastSign = null;
+        lastInputWasEqual = false;
+        lastInputWasAction = true;
+        hasBeenSolved = true;
     }
 
     public static void main(String[] args) {
