@@ -7,16 +7,13 @@ import java.awt.event.ActionListener;
 public class Calculator {
 
     static JTextField textField;
-
     private static int temp, int1, int2;
     private static String lastSign;
     static boolean lastInputWasEqual = false;
     static boolean lastInputWasAction = true;
-
     static boolean dividingByZero = false;
     static boolean solved = true;
     static boolean hasBeenSolved = true;
-
     public static void createAndShowGUI() {
 
         ActionListener myActionListener = new ActionListener() {
@@ -102,7 +99,10 @@ public class Calculator {
         jf.setVisible(true);
     }
     public static void pressNumber(String pressed) {
-        if (lastInputWasAction) {
+        if (dividingByZero) {
+            return;
+        }
+        if (lastInputWasAction || textField.getText().startsWith("0")) {
             textField.setText("");
         }
         if (lastInputWasEqual) {
@@ -115,6 +115,9 @@ public class Calculator {
     }
 
     private static void pressSign(String pressed) {
+        if (dividingByZero) {
+            return;
+        }
         if(lastInputWasAction) {
             lastSign = pressed;
             return;
@@ -139,6 +142,9 @@ public class Calculator {
     }
 
     private static void pressEquals() {
+        if (dividingByZero) {
+            return;
+        }
         if (lastSign == null) {
             solved = true;
             lastInputWasEqual = false;
@@ -166,6 +172,12 @@ public class Calculator {
                 temp = int2 * int1;
                 break;
             case "/":
+                if (int1 == 0) {
+                    clean();
+                    textField.setText("ERROR: DIVISION BY ZERO");
+                    dividingByZero = true;
+                    return;
+                }
                 temp = int2 / int1;
                 break;
         }
@@ -183,6 +195,7 @@ public class Calculator {
         lastInputWasEqual = false;
         lastInputWasAction = true;
         hasBeenSolved = true;
+        dividingByZero = false;
     }
 
     public static void main(String[] args) {
