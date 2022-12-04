@@ -91,6 +91,7 @@ public class Calculator {
         textField.setFont(new Font("Arial", Font.BOLD,16));
         textField.setHorizontalAlignment(JTextField.RIGHT);
         textField.setEditable(false);
+        textField.setText("0");
 
         // Ustawienia okna
         jf.setResizable(false);
@@ -131,14 +132,7 @@ public class Calculator {
             pressEquals();
             solved = true;
         }
-        if (textField.getText().isBlank())
-        {
-            int2 = 0;
-        }
-        else
-        {
-            int2 = Integer.parseInt(textField.getText());
-        }
+        int2 = Integer.parseInt(textField.getText());
         lastSign = pressed;
         solved = false;
         lastInput = Input.ACTION;
@@ -189,7 +183,7 @@ public class Calculator {
     }
 
     public static void clean() {
-        textField.setText("");
+        textField.setText("0");
         int1 = 0;
         int2 = 0;
         lastSign = null;
