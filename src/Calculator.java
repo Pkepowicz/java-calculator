@@ -120,6 +120,7 @@ public class Calculator {
         }
         if(lastInputWasAction) {
             lastSign = pressed;
+            solved = false;
             return;
         }
         if (textField.getText().isBlank()) {
