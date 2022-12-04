@@ -6,11 +6,16 @@ import java.awt.event.ActionListener;
 
 public class Calculator {
 
+    enum Input {
+        NUMBER,
+        EQUAL,
+        ACTION,
+    }
+
     static JTextField textField;
     private static int temp, int1, int2;
     private static String lastSign;
-    static boolean lastInputWasEqual = false;
-    static boolean lastInputWasAction = true;
+    private static Input lastInput = Input.ACTION;
     static boolean dividingByZero = false;
     static boolean solved = true;
     static boolean hasBeenSolved = true;
@@ -102,44 +107,41 @@ public class Calculator {
         if (dividingByZero) {
             return;
         }
-        if (lastInputWasAction || textField.getText().startsWith("0")) {
+        if (lastInput == Input.ACTION || textField.getText().startsWith("0")) {
             textField.setText("");
         }
-        if (lastInputWasEqual) {
+        if (lastInput == Input.EQUAL) {
             textField.setText("");
             lastSign = null;
         }
         textField.setText(textField.getText().concat(pressed));
-        lastInputWasAction = false;
-        lastInputWasEqual = false;
+        lastInput = Input.NUMBER;
     }
 
     private static void pressSign(String pressed) {
         if (dividingByZero) {
             return;
         }
-        if(lastInputWasAction) {
+        if(lastInput == Input.ACTION) {
             lastSign = pressed;
             solved = false;
-            return;
-        }
-        if (textField.getText().isBlank()) {
-            lastSign = pressed;
-            int2 = 0;
-            solved = false;
-            lastInputWasAction = true;
-            lastInputWasEqual = false;
             return;
         }
         if (!solved) {
             pressEquals();
             solved = true;
         }
+        if (textField.getText().isBlank())
+        {
+            int2 = 0;
+        }
+        else
+        {
+            int2 = Integer.parseInt(textField.getText());
+        }
         lastSign = pressed;
-        int2 = Integer.parseInt(textField.getText());
         solved = false;
-        lastInputWasAction = true;
-        lastInputWasEqual = false;
+        lastInput = Input.ACTION;
     }
 
     private static void pressEquals() {
@@ -148,15 +150,14 @@ public class Calculator {
         }
         if (lastSign == null) {
             solved = true;
-            lastInputWasEqual = false;
-            lastInputWasAction = true;
+            lastInput = Input.ACTION;
             hasBeenSolved = true;
             if (!textField.getText().isEmpty()) {
                 int2 = Integer.parseInt(textField.getText());
             }
             return;
         }
-        if (lastInputWasEqual) {
+        if (lastInput == Input.EQUAL) {
             int2 = temp;
         } else {
             temp = int2;
@@ -183,8 +184,7 @@ public class Calculator {
                 break;
         }
         textField.setText(String.valueOf(temp));
-        lastInputWasEqual = true;
-        lastInputWasAction = false;
+        lastInput = Input.EQUAL;
         solved = true;
     }
 
@@ -193,8 +193,7 @@ public class Calculator {
         int1 = 0;
         int2 = 0;
         lastSign = null;
-        lastInputWasEqual = false;
-        lastInputWasAction = true;
+        lastInput = Input.ACTION;
         hasBeenSolved = true;
         dividingByZero = false;
     }
